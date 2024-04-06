@@ -1,15 +1,18 @@
-// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-// import Home from "./pages/Home";
-// function App() {
-//   return (
-//     <Router>
-//       <div className="App">
-//         <Routes>
-//           <Route path="/" element={<Home />} />
-//         </Routes>
-//       </div>
-//     </Router>
-//   );
-// }
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Map from "./pages/Map";
 
-// export default App;
+const App = () => {
+  return (
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<Map />} />
+          {/* <Route path="/" element={<Home />} /> */}
+        </Routes>
+      </div>
+    </Router>
+  );
+};
+
+export default App;

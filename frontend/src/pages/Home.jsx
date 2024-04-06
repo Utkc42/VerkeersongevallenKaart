@@ -1,7 +1,6 @@
 import "react";
 const Home = () => {
-  <div>
-    <h1>Test</h1>
-  </div>;
+  return <div className="home"></div>;
 };
+
 export default Home;

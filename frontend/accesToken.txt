@@ -1,0 +1,43 @@
+mapStyle="mapbox://styles/mo42/cluldw1ye00kw01qqg4nhc50k"
+mapboxAccessToken="pk.eyJ1IjoibW80MiIsImEiOiJjbHVsZDYzeTAweGh0MnFsNWkwYTJuMjgyIn0.qiKICPYsmaJC3ZcdpAy91g"
+
+
+
+
+import { useState } from "react";
+import Filter from "../components/Filters";
+
+import ReactMapGl, {
+  FullscreenControl,
+  GeolocateControl,
+  NavigationControl,
+} from "react-map-gl";
+
+const Map = () => {
+  const [viewState, setViewState] = useState({
+    latitude: 50.8503,
+    longitude: 4.3517,
+    zoom: 7.5,
+  });
+
+  return (
+    <div>
+      <ReactMapGl
+        {...viewState}
+        onMove={(e) => setViewState(e.viewState)}
+        mapStyle="mapbox://styles/mo42/cluldw1ye00kw01qqg4nhc50k"
+        mapboxAccessToken="x"
+        style={{
+          width: "70%",
+          height: "80vh",
+        }}
+      >
+        <GeolocateControl />
+        <FullscreenControl />
+        <NavigationControl />
+      </ReactMapGl>
+    </div>
+  );
+};
+
+export default Map;
