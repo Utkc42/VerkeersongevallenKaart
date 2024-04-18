@@ -9,9 +9,18 @@ const Filters = () => {
         <button onClick={() => setLanguage("nl")}>Nederlands</button>
         <button onClick={() => setLanguage("fr")}>Français</button>
       </div>
+
       {language === "nl" && (
         <div>
           <h3>Filters</h3>
+
+          <label htmlFor="gemeente-select">Gemeente/Stad:</label>
+          <select id="gemeente-select">
+            <option value="">Selecteer gemeente/stad</option>
+            <option value=""></option>
+          </select>
+          <br />
+          <br />
 
           <label htmlFor="typeOngeval-select">Ongeval Type:</label>
           <select id="jaar-select">
@@ -51,6 +60,14 @@ const Filters = () => {
       {language === "fr" && (
         <div>
           <h3>Filtres</h3>
+
+          <label htmlFor="municipalité-select">Municipalité/Ville:</label>
+          <select id="gemeente-select">
+            <option value="">Choisir municipalité/ville</option>
+            <option value=""></option>
+          </select>
+          <br />
+          <br />
 
           <label htmlFor="typeOngeval-select">Type accident:</label>
           <select id="jaar-select">
