@@ -1,0 +1,11 @@
+php backend runnen door:
+php artisan serve
+
+frontend runnen: yarn dev run
+
+Na het wijzigen van een bestand of folder voer volgende commando: composer dump-autoload
+
+
+
+Bir sonraki task:
+Bir sonraki adim: 10 tane limit yerine tum datayi cek ve postman da kontrol et, olursa frontend de gostermeye calis
