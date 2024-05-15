@@ -15,7 +15,7 @@ const MapPage = () => {
   const [viewState, setViewState] = useState({
     latitude: 50.8503,
     longitude: 4.3517,
-    zoom: 12,
+    zoom: 8,
   });
 
   const [markers, setMarkers] = useState([]);
@@ -59,6 +59,10 @@ const MapPage = () => {
   const handleSearchClick = () => {
     setFetchMarkers(true);
   };
+  const handleResetClick = () => {
+    setMarkers([]); // Clear all markers from the map
+    setFilterCriteria({}); // Reset filter criteria
+  };
 
   return (
     <div className="flex h-screen">
@@ -96,6 +100,12 @@ const MapPage = () => {
           onClick={handleSearchClick}
         >
           Zoek Op Kaart
+        </button>
+        <button
+          className="mt-4 ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          onClick={handleResetClick}
+        >
+          Reset
         </button>
       </div>
       <Link

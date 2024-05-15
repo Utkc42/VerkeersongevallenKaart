@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
+import Select from "react-select";
 
 const Filters = ({ setFilterCriteria }) => {
-  const [uniqueYears, setUniqueYears] = useState([]);
-  const [uniqueMonths, setUniqueMonths] = useState([]);
-  const [uniqueTimes, setUniqueTimes] = useState([]);
-  const [uniqueRegions, setUniqueRegions] = useState([]);
-  const [uniqueProvinces, setUniqueProvinces] = useState([]);
-  const [uniqueCities, setUniqueCities] = useState([]);
-  const [uniqueCrossroads, setUniqueCrossroads] = useState([]);
-  const [uniqueBuildingAreas, setUniqueBuildingAreas] = useState([]);
+  const [options, setOptions] = useState({
+    jaar: [],
+    maand: [],
+    tijd: [],
+    regio: [],
+    provincie: [],
+    stad: [],
+    kruispunt: [],
+    bebouwingsgebied: [],
+  });
 
   useEffect(() => {
     axios
@@ -18,14 +21,19 @@ const Filters = ({ setFilterCriteria }) => {
       .then((response) => {
         const data = response.data;
         if (data) {
-          setUniqueYears(data.jaar.map(String));
-          setUniqueMonths(data.maand.map(String));
-          setUniqueTimes(data.tijd.map(String));
-          setUniqueRegions(data.regio.map(String));
-          setUniqueProvinces(data.provincie.map(String));
-          setUniqueCities(data.stad.map(String));
-          setUniqueCrossroads(data.kruispunt.map(String));
-          setUniqueBuildingAreas(data.bebouwingsgebied.map(String));
+          setOptions({
+            jaar: data.jaar.map((value) => ({ value, label: value })),
+            maand: data.maand.map((value) => ({ value, label: value })),
+            tijd: data.tijd.map((value) => ({ value, label: value })),
+            regio: data.regio.map((value) => ({ value, label: value })),
+            provincie: data.provincie.map((value) => ({ value, label: value })),
+            stad: data.stad.map((value) => ({ value, label: value })),
+            kruispunt: data.kruispunt.map((value) => ({ value, label: value })),
+            bebouwingsgebied: data.bebouwingsgebied.map((value) => ({
+              value,
+              label: value,
+            })),
+          });
         } else {
           console.error("Expected an object with filter arrays but got:", data);
         }
@@ -35,34 +43,37 @@ const Filters = ({ setFilterCriteria }) => {
       });
   }, []);
 
-  const handleFilterChange = (filterName, event) => {
-    const selectedOptions = Array.from(
-      event.target.selectedOptions,
-      (option) => option.value
-    );
+  const handleFilterChange = (filterName, selectedOptions) => {
+    const values = selectedOptions
+      ? selectedOptions.map((option) => option.value)
+      : [];
     setFilterCriteria((prev) => ({
       ...prev,
-      [filterName]: selectedOptions,
+      [filterName]: values,
     }));
   };
 
   return (
     <div className="space-y-4">
       {[
-        { label: "Jaar", items: uniqueYears, filterName: "jaar" },
-        { label: "Maand", items: uniqueMonths, filterName: "maand" },
-        { label: "Tijd", items: uniqueTimes, filterName: "tijd" },
-        { label: "Regio", items: uniqueRegions, filterName: "regio" },
-        { label: "Provincie", items: uniqueProvinces, filterName: "provincie" },
-        { label: "Stad", items: uniqueCities, filterName: "stad" },
+        { label: "Jaar", items: options.jaar, filterName: "jaar" },
+        { label: "Maand", items: options.maand, filterName: "maand" },
+        { label: "Tijd", items: options.tijd, filterName: "tijd" },
+        { label: "Regio", items: options.regio, filterName: "regio" },
+        {
+          label: "Provincie",
+          items: options.provincie,
+          filterName: "provincie",
+        },
+        { label: "Stad", items: options.stad, filterName: "stad" },
         {
           label: "Kruispunt",
-          items: uniqueCrossroads,
+          items: options.kruispunt,
           filterName: "kruispunt",
         },
         {
           label: "Bebouwingsgebied",
-          items: uniqueBuildingAreas,
+          items: options.bebouwingsgebied,
           filterName: "bebouwingsgebied",
         },
       ].map(({ label, items, filterName }) => (
@@ -71,15 +82,16 @@ const Filters = ({ setFilterCriteria }) => {
           label={label}
           id={`${filterName}-select`}
           items={items}
-          onChange={(e) => handleFilterChange(filterName, e)}
-          multiple={true}
+          onChange={(selectedOptions) =>
+            handleFilterChange(filterName, selectedOptions)
+          }
         />
       ))}
     </div>
   );
 };
 
-const Dropdown = ({ label, id, items, onChange, multiple }) => (
+const Dropdown = ({ label, id, items, onChange }) => (
   <div className="my-2">
     <label
       htmlFor={id}
@@ -87,19 +99,14 @@ const Dropdown = ({ label, id, items, onChange, multiple }) => (
     >
       {label}:
     </label>
-    <select
-      multiple={multiple}
-      id={id}
-      className="bg-gray-800 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyber-blue focus:border-cyber-blue block w-full p-2.5"
+    <Select
+      isMulti
+      name={id}
+      options={items}
       onChange={onChange}
-      size={multiple ? 3 : undefined}
-    >
-      {items.map((item, index) => (
-        <option key={index} value={item}>
-          {item}
-        </option>
-      ))}
-    </select>
+      className="basic-multi-select"
+      classNamePrefix="select"
+    />
   </div>
 );
 
@@ -110,9 +117,8 @@ Filters.propTypes = {
 Dropdown.propTypes = {
   label: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  items: PropTypes.arrayOf(PropTypes.string).isRequired,
+  items: PropTypes.arrayOf(PropTypes.object).isRequired,
   onChange: PropTypes.func.isRequired,
-  multiple: PropTypes.bool,
 };
 
 export default Filters;
