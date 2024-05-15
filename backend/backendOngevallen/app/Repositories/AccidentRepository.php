@@ -60,4 +60,25 @@ class AccidentRepository implements IAccidentRepository
             return Accident::distinct($column)->orderBy($column, 'asc')->pluck($column);
         });
     }
+
+    public function processBatch($offset, $batchSize)
+    {
+        $accidents = Accident::skip($offset)->take($batchSize)->get();
+
+        foreach ($accidents as $accident) {
+            // Voorbeeld van een conversie functie die je zou kunnen implementeren of gebruiken
+            [$newLongitude, $newLatitude] = $this->convertCoordinates($accident->longitude, $accident->latitude);
+
+            $accident->longitude = $newLongitude;
+            $accident->latitude = $newLatitude;
+            $accident->save();
+        }
+    }
+
+    private function convertCoordinates($longitude, $latitude)
+    {
+        // Implementatie van de conversie van Lambert 72 naar WGS 84
+        // Dit is slechts een voorbeeld en moet worden vervangen door de daadwerkelijke conversie logica
+        return [$longitude + 0.0001, $latitude + 0.0001];
+    }
 }

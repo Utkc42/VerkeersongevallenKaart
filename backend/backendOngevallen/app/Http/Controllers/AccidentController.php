@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Interfaces\IAccidentRepository;
 use Illuminate\Http\Request;
+use App\Models\Accident;
 
 class AccidentController extends Controller
 {
@@ -24,9 +25,31 @@ class AccidentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $accidents = $this->accidentRepo->getAllAccidents(100); // Je kunt de paginatie aanpassen
+        $query = Accident::query();  // Start de query
+
+        // Voeg filters toe voor elk veld waarop gefilterd kan worden
+        $filters = [
+            'JAAR' => 'jaar',
+            'MAAND' => 'maand',
+            'TIJD' => 'tijd',
+            'REGIO' => 'regio',
+            'PROVINCIE' => 'provincie',
+            'STAD' => 'stad',
+            'KRUISPUNT' => 'kruispunt',
+            'BEBOUWINGSGEBIED' => 'bebouwingsgebied'
+            // Voeg andere filters toe zoals nodig
+        ];
+
+        foreach ($filters as $column => $param) {
+            if ($request->has($param)) {
+                $query->whereIn($column, $request->$param);
+            }
+        }
+
+        // Gebruik paginatie om de resultaten beheersbaar te houden
+        $accidents = $query->paginate(100); 
         return response()->json($accidents);
     }
 

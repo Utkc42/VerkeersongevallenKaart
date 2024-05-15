@@ -18,20 +18,14 @@ const Filters = ({ setFilterCriteria }) => {
       .then((response) => {
         const data = response.data;
         if (data) {
-          setUniqueYears(data.jaar.map((year) => String(year)));
-          setUniqueMonths(data.maand.map((month) => String(month)));
-          setUniqueTimes(data.tijd.map((time) => String(time)));
-          setUniqueRegions(data.regio.map((region) => String(region)));
-          setUniqueProvinces(
-            data.provincie.map((province) => String(province))
-          );
-          setUniqueCities(data.stad.map((city) => String(city)));
-          setUniqueCrossroads(
-            data.kruispunt.map((crossroad) => String(crossroad))
-          );
-          setUniqueBuildingAreas(
-            data.bebouwingsgebied.map((area) => String(area))
-          );
+          setUniqueYears(data.jaar.map(String));
+          setUniqueMonths(data.maand.map(String));
+          setUniqueTimes(data.tijd.map(String));
+          setUniqueRegions(data.regio.map(String));
+          setUniqueProvinces(data.provincie.map(String));
+          setUniqueCities(data.stad.map(String));
+          setUniqueCrossroads(data.kruispunt.map(String));
+          setUniqueBuildingAreas(data.bebouwingsgebied.map(String));
         } else {
           console.error("Expected an object with filter arrays but got:", data);
         }
@@ -41,8 +35,15 @@ const Filters = ({ setFilterCriteria }) => {
       });
   }, []);
 
-  const handleFilterChange = (filterName, value) => {
-    setFilterCriteria((prev) => ({ ...prev, [filterName]: value }));
+  const handleFilterChange = (filterName, event) => {
+    const selectedOptions = Array.from(
+      event.target.selectedOptions,
+      (option) => option.value
+    );
+    setFilterCriteria((prev) => ({
+      ...prev,
+      [filterName]: selectedOptions,
+    }));
   };
 
   return (
@@ -70,15 +71,15 @@ const Filters = ({ setFilterCriteria }) => {
           label={label}
           id={`${filterName}-select`}
           items={items}
-          onChange={handleFilterChange}
-          filterName={filterName}
+          onChange={(e) => handleFilterChange(filterName, e)}
+          multiple={true}
         />
       ))}
     </div>
   );
 };
 
-const Dropdown = ({ label, id, items, onChange, filterName }) => (
+const Dropdown = ({ label, id, items, onChange, multiple }) => (
   <div className="my-2">
     <label
       htmlFor={id}
@@ -87,9 +88,11 @@ const Dropdown = ({ label, id, items, onChange, filterName }) => (
       {label}:
     </label>
     <select
+      multiple={multiple}
       id={id}
       className="bg-gray-800 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyber-blue focus:border-cyber-blue block w-full p-2.5"
-      onChange={(e) => onChange(filterName, e.target.value)}
+      onChange={onChange}
+      size={multiple ? 3 : undefined}
     >
       {items.map((item, index) => (
         <option key={index} value={item}>
@@ -109,7 +112,7 @@ Dropdown.propTypes = {
   id: PropTypes.string.isRequired,
   items: PropTypes.arrayOf(PropTypes.string).isRequired,
   onChange: PropTypes.func.isRequired,
-  filterName: PropTypes.string.isRequired,
+  multiple: PropTypes.bool,
 };
 
 export default Filters;
