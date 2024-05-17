@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import Filter from "../components/Filters";
 import markerImage from "../img/marker.png";
 import ErrorBoundary from "../error/ErrorBoundary";
+import InformatiePopup from "./InformatiePopup";
 
 const MapPage = () => {
   const [viewState, setViewState] = useState({
@@ -21,6 +22,7 @@ const MapPage = () => {
   const [markers, setMarkers] = useState([]);
   const [filterCriteria, setFilterCriteria] = useState({});
   const [fetchMarkers, setFetchMarkers] = useState(false);
+  const [selectedMarker, setSelectedMarker] = useState(null);
 
   useEffect(() => {
     if (fetchMarkers) {
@@ -44,10 +46,27 @@ const MapPage = () => {
             !isNaN(acc.latitude)
         );
         const newMarkersData = validAccidents.map((acc) => ({
+          key: `${acc.id}-${acc.longitude}-${acc.latitude}`, // Unieke sleutel voor elke marker
+          id: acc.id,
           latitude: parseFloat(acc.latitude),
           longitude: parseFloat(acc.longitude),
+          jaar: acc.JAAR,
+          maand: acc.MAAND,
+          tijd: acc.TIJD,
+          regio: acc.REGIO,
+          provincie: acc.PROVINCIE,
+          stad: acc.STAD,
+          kruispunt: acc.KRUISPUNT,
+          bebouwingsgebied: acc.BEBOUWINGSGEBIED,
         }));
-        setMarkers((prevMarkers) => [...prevMarkers, ...newMarkersData]);
+        setMarkers((prevMarkers) => {
+          const allMarkers = [...prevMarkers, ...newMarkersData];
+          const uniqueMarkers = allMarkers.filter(
+            (marker, index, self) =>
+              index === self.findIndex((m) => m.key === marker.key)
+          );
+          return uniqueMarkers;
+        });
       } else {
         console.error("Expected an array, received:", response.data);
       }
@@ -59,9 +78,11 @@ const MapPage = () => {
   const handleSearchClick = () => {
     setFetchMarkers(true);
   };
+
   const handleResetClick = () => {
     setMarkers([]); // Clear all markers from the map
     setFilterCriteria({}); // Reset filter criteria
+    setSelectedMarker(null); // Deselect any selected marker
   };
 
   return (
@@ -75,19 +96,28 @@ const MapPage = () => {
           mapboxAccessToken="pk.eyJ1IjoibW80MiIsImEiOiJjbHc1YzAxejAwcTZvMnpyejJlbzl4aW1nIn0.CKmkMIFr7WrYL8gDGz-U4Q"
           onMove={(evt) => setViewState(evt.viewState)}
         >
-          {markers.map((marker, index) => (
+          {markers.map((marker) => (
             <Marker
-              key={index}
+              key={marker.key} // Gebruik unieke sleutel
               latitude={marker.latitude}
               longitude={marker.longitude}
+              onClick={() => setSelectedMarker(marker)}
             >
               <img
                 src={markerImage}
                 alt="Custom Marker"
-                style={{ width: "30px", height: "30px" }}
+                style={{ width: "30px", height: "30px", cursor: "pointer" }}
               />
             </Marker>
           ))}
+
+          {selectedMarker && (
+            <InformatiePopup
+              marker={selectedMarker}
+              onClose={() => setSelectedMarker(null)}
+            />
+          )}
+
           <NavigationControl />
           <FullscreenControl />
           <GeolocateControl />
