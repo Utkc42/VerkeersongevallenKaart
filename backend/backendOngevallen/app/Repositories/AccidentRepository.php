@@ -23,9 +23,12 @@ class AccidentRepository implements IAccidentRepository
     }
 
   // In je repository of model, pas de naamgeving aan:
-public function getAllAccidents($perPage = 100)
+// In je AccidentRepository of model
+public function getAllAccidents($perPage = 1000)
 {
-    return Accident::paginate($perPage)->map(function ($accident) {
+    $accidents = Accident::paginate($perPage);
+
+    $accidents->getCollection()->transform(function ($accident) {
         $pointSrc = new Point($accident->longitude, $accident->latitude, $this->projLambert72);
         $pointDest = $this->proj4->transform($this->projWGS84, $pointSrc);
 
@@ -44,7 +47,10 @@ public function getAllAccidents($perPage = 100)
             $pointDest->y   // latitude
         );
     });
+
+    return $accidents;
 }
+
 
 public function getUniqueFilterValues()
     {

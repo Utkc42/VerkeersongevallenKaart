@@ -2,6 +2,21 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
 import Select from "react-select";
+import {
+  wegtype,
+  WEER,
+  BEBOUWINGSGEBIED,
+  PROVINCIE,
+  WEERLICHT,
+  REGIO,
+  KRUISPUNT,
+  WEGCONDITIE,
+  VERKEERSSLACHTOFFERS,
+  VOERTUIGTYPE1,
+  VOERTUIGTYPE2,
+  BOTSINGTYPE,
+  OBSTAKELS,
+} from "../components/DataConstants";
 
 const Filters = ({ setFilterCriteria }) => {
   const [options, setOptions] = useState({
@@ -25,13 +40,22 @@ const Filters = ({ setFilterCriteria }) => {
             jaar: data.jaar.map((value) => ({ value, label: value })),
             maand: data.maand.map((value) => ({ value, label: value })),
             tijd: data.tijd.map((value) => ({ value, label: value })),
-            regio: data.regio.map((value) => ({ value, label: value })),
-            provincie: data.provincie.map((value) => ({ value, label: value })),
+            regio: Object.keys(REGIO).map((key) => ({
+              value: key,
+              label: REGIO[key],
+            })),
+            provincie: Object.keys(PROVINCIE).map((key) => ({
+              value: key,
+              label: PROVINCIE[key],
+            })),
             stad: data.stad.map((value) => ({ value, label: value })),
-            kruispunt: data.kruispunt.map((value) => ({ value, label: value })),
-            bebouwingsgebied: data.bebouwingsgebied.map((value) => ({
-              value,
-              label: value,
+            kruispunt: Object.keys(KRUISPUNT).map((key) => ({
+              value: key,
+              label: KRUISPUNT[key],
+            })),
+            bebouwingsgebied: Object.keys(BEBOUWINGSGEBIED).map((key) => ({
+              value: key,
+              label: BEBOUWINGSGEBIED[key],
             })),
           });
         } else {

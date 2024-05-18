@@ -27,6 +27,9 @@ class AccidentController extends Controller
      */
     public function index(Request $request)
     {
+        // Verhoog de geheugenlimiet
+        ini_set('memory_limit', '512M');
+        
         $query = Accident::query();  // Start de query
 
         // Voeg filters toe voor elk veld waarop gefilterd kan worden
@@ -39,7 +42,6 @@ class AccidentController extends Controller
             'STAD' => 'stad',
             'KRUISPUNT' => 'kruispunt',
             'BEBOUWINGSGEBIED' => 'bebouwingsgebied'
-            // Voeg andere filters toe zoals nodig
         ];
 
         foreach ($filters as $column => $param) {
@@ -49,7 +51,7 @@ class AccidentController extends Controller
         }
 
         // Gebruik paginatie om de resultaten beheersbaar te houden
-        $accidents = $query->paginate(100); 
+        $accidents = $query->paginate(1000); 
         return response()->json($accidents);
     }
 

@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+// src/pages/Map.jsx
+
+import { useState, useEffect, useRef } from "react";
 import ReactMapGL, {
   Marker,
   NavigationControl,
@@ -11,6 +13,21 @@ import Filter from "../components/Filters";
 import markerImage from "../img/marker.png";
 import ErrorBoundary from "../error/ErrorBoundary";
 import InformatiePopup from "./InformatiePopup";
+import {
+  wegtype,
+  WEER,
+  BEBOUWINGSGEBIED,
+  PROVINCIE,
+  WEERLICHT,
+  REGIO,
+  KRUISPUNT,
+  WEGCONDITIE,
+  VERKEERSSLACHTOFFERS,
+  VOERTUIGTYPE1,
+  VOERTUIGTYPE2,
+  BOTSINGTYPE,
+  OBSTAKELS,
+} from "../components/DataConstants";
 
 const MapPage = () => {
   const [viewState, setViewState] = useState({
@@ -23,6 +40,19 @@ const MapPage = () => {
   const [filterCriteria, setFilterCriteria] = useState({});
   const [fetchMarkers, setFetchMarkers] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState(null);
+  const colorMapRef = useRef({});
+  const colorIndexRef = useRef(0);
+
+  const colorPalette = [
+    "0deg",
+    "45deg",
+    "90deg",
+    "135deg",
+    "180deg",
+    "225deg",
+    "270deg",
+    "315deg",
+  ];
 
   useEffect(() => {
     if (fetchMarkers) {
@@ -53,11 +83,20 @@ const MapPage = () => {
           jaar: acc.JAAR,
           maand: acc.MAAND,
           tijd: acc.TIJD,
-          regio: acc.REGIO,
-          provincie: acc.PROVINCIE,
           stad: acc.STAD,
-          kruispunt: acc.KRUISPUNT,
-          bebouwingsgebied: acc.BEBOUWINGSGEBIED,
+          wegtype: wegtype[acc.WEGTYPE],
+          weer: WEER[acc.WEER],
+          bebouwingsgebied: BEBOUWINGSGEBIED[acc.BEBOUWINGSGEBIED],
+          provincie: PROVINCIE[acc.PROVINCIE],
+          weerlicht: WEERLICHT[acc.WEERLICHT],
+          regio: REGIO[acc.REGIO],
+          kruispunt: KRUISPUNT[acc.KRUISPUNT],
+          wegconditie: WEGCONDITIE[acc.WEGCONDITIE],
+          verkeersslachtoffers: VERKEERSSLACHTOFFERS[acc.VERKEERSSLACHTOFFERS],
+          voertuigtype1: VOERTUIGTYPE1[acc.VOERTUIGTYPE1],
+          voertuigtype2: VOERTUIGTYPE2[acc.VOERTUIGTYPE2],
+          botsingtype: BOTSINGTYPE[acc.BOTSINGTYPE],
+          obstakels: OBSTAKELS[acc.OBSTAKELS],
         }));
         setMarkers((prevMarkers) => {
           const allMarkers = [...prevMarkers, ...newMarkersData];
@@ -83,6 +122,17 @@ const MapPage = () => {
     setMarkers([]); // Clear all markers from the map
     setFilterCriteria({}); // Reset filter criteria
     setSelectedMarker(null); // Deselect any selected marker
+    colorMapRef.current = {}; // Reset color map
+    colorIndexRef.current = 0; // Reset color index
+  };
+
+  const getColor = (value) => {
+    if (!colorMapRef.current[value]) {
+      colorMapRef.current[value] =
+        colorPalette[colorIndexRef.current % colorPalette.length];
+      colorIndexRef.current++;
+    }
+    return colorMapRef.current[value];
   };
 
   return (
@@ -98,7 +148,7 @@ const MapPage = () => {
         >
           {markers.map((marker) => (
             <Marker
-              key={marker.key} // Gebruik unieke sleutel
+              key={marker.key}
               latitude={marker.latitude}
               longitude={marker.longitude}
               onClick={() => setSelectedMarker(marker)}
@@ -106,7 +156,12 @@ const MapPage = () => {
               <img
                 src={markerImage}
                 alt="Custom Marker"
-                style={{ width: "30px", height: "30px", cursor: "pointer" }}
+                style={{
+                  width: "30px",
+                  height: "30px",
+                  cursor: "pointer",
+                  filter: `hue-rotate(${getColor(marker.jaar)})`,
+                }}
               />
             </Marker>
           ))}
