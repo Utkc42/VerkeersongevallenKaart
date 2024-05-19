@@ -19,41 +19,53 @@ class AccidentController extends Controller
     {
         $this->accidentRepo = $accidentRepo;
     }
-
+    
+    //ini_set('memory_limit', '512M');
     /**
      * Geeft een lijst van alle ongevallen met paginatie.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
-        // Verhoog de geheugenlimiet
-        ini_set('memory_limit', '512M');
-        
-        $query = Accident::query();  // Start de query
+public function index(Request $request)
+{
+    $query = Accident::query();  // Start de query
 
-        // Voeg filters toe voor elk veld waarop gefilterd kan worden
-        $filters = [
-            'JAAR' => 'jaar',
-            'MAAND' => 'maand',
-            'TIJD' => 'tijd',
-            'REGIO' => 'regio',
-            'PROVINCIE' => 'provincie',
-            'STAD' => 'stad',
-            'KRUISPUNT' => 'kruispunt',
-            'BEBOUWINGSGEBIED' => 'bebouwingsgebied'
-        ];
+    // Voeg filters toe voor elk veld waarop gefilterd kan worden
+    $filters = [
+         'JAAR' => 'jaar',
+        'MAAND' => 'maand',
+        'TIJD' => 'tijd',
+        'REGIO' => 'regio',
+        'STAD' => 'stad',
+        'KRUISPUNT' => 'kruispunt',
+        'BEBOUWINGSGEBIED' => 'bebouwingsgebied',
+        'WEGTYPE' => 'wegtype',
+        'WEER' => 'weer',
+        'WEERLICHT' => 'weerlicht'
+    ];
 
-        foreach ($filters as $column => $param) {
-            if ($request->has($param)) {
-                $query->whereIn($column, $request->$param);
-            }
+    foreach ($filters as $column => $param) {
+        if ($request->has($param)) {
+            $query->whereIn($column, (array) $request->input($param));
         }
-
-        // Gebruik paginatie om de resultaten beheersbaar te houden
-        $accidents = $query->paginate(1000); 
-        return response()->json($accidents);
     }
+
+    // Voeg een specifieke filter toe voor jaar/maand combinatie
+    if ($request->has('jaarMaand')) {
+        $jaarMaand = explode('/', $request->input('jaarMaand'));
+        if (count($jaarMaand) == 2) {
+            $query->where('JAAR', $jaarMaand[1])
+                  ->where('MAAND', $jaarMaand[0]);
+        }
+    }
+
+    // Gebruik paginatie om de resultaten beheersbaar te houden
+    $accidents = $query->paginate(100000); 
+    return response()->json($accidents);
+}
+
+
+
 
     /**
      * Geeft een JSON response van unieke waarden voor filters.

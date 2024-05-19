@@ -1,4 +1,13 @@
 import PropTypes from "prop-types";
+import {
+  PROVINCIE,
+  WEGCONDITIE,
+  VERKEERSSLACHTOFFERS,
+  VOERTUIGTYPE1,
+  VOERTUIGTYPE2,
+  BOTSINGTYPE,
+  OBSTAKELS,
+} from "../components/DataConstants";
 
 const InformatiePopup = ({ marker, onClose }) => {
   return (
@@ -15,10 +24,7 @@ const InformatiePopup = ({ marker, onClose }) => {
         <h2 className="text-2xl font-bold mb-4">Ongeval Informatie</h2>
         <div className="space-y-2 text-lg">
           <p>
-            <strong>Jaar:</strong> {marker.jaar}
-          </p>
-          <p>
-            <strong>Maand:</strong> {marker.maand}
+            <strong>Jaar/Maand:</strong> {marker.maand}/{marker.jaar}
           </p>
           <p>
             <strong>Tijd:</strong> {marker.tijd}
@@ -27,7 +33,7 @@ const InformatiePopup = ({ marker, onClose }) => {
             <strong>Regio:</strong> {marker.regio}
           </p>
           <p>
-            <strong>Provincie:</strong> {marker.provincie}
+            <strong>Provincie:</strong> {PROVINCIE[marker.provincie]}
           </p>
           <p>
             <strong>Stad:</strong> {marker.stad}
@@ -48,22 +54,25 @@ const InformatiePopup = ({ marker, onClose }) => {
             <strong>Weerlicht:</strong> {marker.weerlicht}
           </p>
           <p>
-            <strong>Wegconditie:</strong> {marker.wegconditie}
+            <strong>Wegconditie:</strong> {WEGCONDITIE[marker.wegconditie]}
           </p>
           <p>
-            <strong>Verkeersslachtoffers:</strong> {marker.verkeersslachtoffers}
+            <strong>Verkeersslachtoffers:</strong>{" "}
+            {VERKEERSSLACHTOFFERS[marker.verkeersslachtoffers]}
           </p>
           <p>
-            <strong>Voertuigtype 1:</strong> {marker.voertuigtype1}
+            <strong>Voertuigtype 1:</strong>{" "}
+            {VOERTUIGTYPE1[marker.voertuigtype1]}
           </p>
           <p>
-            <strong>Voertuigtype 2:</strong> {marker.voertuigtype2}
+            <strong>Voertuigtype 2:</strong>{" "}
+            {VOERTUIGTYPE2[marker.voertuigtype2]}
           </p>
           <p>
-            <strong>Botsingtype:</strong> {marker.botsingtype}
+            <strong>Botsingtype:</strong> {BOTSINGTYPE[marker.botsingtype]}
           </p>
           <p>
-            <strong>Obstakels:</strong> {marker.obstakels}
+            <strong>Obstakels:</strong> {OBSTAKELS[marker.obstakels]}
           </p>
         </div>
       </div>

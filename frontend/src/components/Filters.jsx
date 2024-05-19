@@ -3,31 +3,26 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import Select from "react-select";
 import {
-  wegtype,
-  WEER,
   BEBOUWINGSGEBIED,
-  PROVINCIE,
-  WEERLICHT,
   REGIO,
   KRUISPUNT,
-  WEGCONDITIE,
-  VERKEERSSLACHTOFFERS,
-  VOERTUIGTYPE1,
-  VOERTUIGTYPE2,
-  BOTSINGTYPE,
-  OBSTAKELS,
+  wegtype,
+  WEER,
+  WEERLICHT,
 } from "../components/DataConstants";
+import { formatTime } from "../components/TimeFormat";
 
 const Filters = ({ setFilterCriteria }) => {
   const [options, setOptions] = useState({
-    jaar: [],
-    maand: [],
+    jaarMaand: [],
     tijd: [],
     regio: [],
-    provincie: [],
     stad: [],
     kruispunt: [],
     bebouwingsgebied: [],
+    wegtype: [],
+    weer: [],
+    weerlicht: [],
   });
 
   useEffect(() => {
@@ -37,16 +32,17 @@ const Filters = ({ setFilterCriteria }) => {
         const data = response.data;
         if (data) {
           setOptions({
-            jaar: data.jaar.map((value) => ({ value, label: value })),
-            maand: data.maand.map((value) => ({ value, label: value })),
-            tijd: data.tijd.map((value) => ({ value, label: value })),
+            jaarMaand: data.jaarMaand.map((value) => ({
+              value: `${value.maand}/${value.jaar}`,
+              label: `${value.maand}/${value.jaar}`,
+            })),
+            tijd: data.tijd.map((value) => ({
+              value,
+              label: formatTime(value),
+            })),
             regio: Object.keys(REGIO).map((key) => ({
               value: key,
               label: REGIO[key],
-            })),
-            provincie: Object.keys(PROVINCIE).map((key) => ({
-              value: key,
-              label: PROVINCIE[key],
             })),
             stad: data.stad.map((value) => ({ value, label: value })),
             kruispunt: Object.keys(KRUISPUNT).map((key) => ({
@@ -56,6 +52,18 @@ const Filters = ({ setFilterCriteria }) => {
             bebouwingsgebied: Object.keys(BEBOUWINGSGEBIED).map((key) => ({
               value: key,
               label: BEBOUWINGSGEBIED[key],
+            })),
+            wegtype: Object.keys(wegtype).map((key) => ({
+              value: parseInt(key, 10),
+              label: wegtype[key],
+            })),
+            weer: Object.keys(WEER).map((key) => ({
+              value: parseInt(key, 10),
+              label: WEER[key],
+            })),
+            weerlicht: Object.keys(WEERLICHT).map((key) => ({
+              value: parseInt(key, 10),
+              label: WEERLICHT[key],
             })),
           });
         } else {
@@ -67,28 +75,24 @@ const Filters = ({ setFilterCriteria }) => {
       });
   }, []);
 
-  const handleFilterChange = (filterName, selectedOptions) => {
-    const values = selectedOptions
-      ? selectedOptions.map((option) => option.value)
-      : [];
+  const handleFilterChange = (filterName, selectedOption) => {
+    const value = selectedOption ? selectedOption.value : null;
     setFilterCriteria((prev) => ({
       ...prev,
-      [filterName]: values,
+      [filterName]: value,
     }));
   };
 
   return (
     <div className="space-y-4">
       {[
-        { label: "Jaar", items: options.jaar, filterName: "jaar" },
-        { label: "Maand", items: options.maand, filterName: "maand" },
+        {
+          label: "Jaar/Maand",
+          items: options.jaarMaand,
+          filterName: "jaarMaand",
+        },
         { label: "Tijd", items: options.tijd, filterName: "tijd" },
         { label: "Regio", items: options.regio, filterName: "regio" },
-        {
-          label: "Provincie",
-          items: options.provincie,
-          filterName: "provincie",
-        },
         { label: "Stad", items: options.stad, filterName: "stad" },
         {
           label: "Kruispunt",
@@ -100,14 +104,21 @@ const Filters = ({ setFilterCriteria }) => {
           items: options.bebouwingsgebied,
           filterName: "bebouwingsgebied",
         },
+        { label: "Wegtype", items: options.wegtype, filterName: "wegtype" },
+        { label: "Weer", items: options.weer, filterName: "weer" },
+        {
+          label: "Weerlicht",
+          items: options.weerlicht,
+          filterName: "weerlicht",
+        },
       ].map(({ label, items, filterName }) => (
         <Dropdown
           key={filterName}
           label={label}
           id={`${filterName}-select`}
           items={items}
-          onChange={(selectedOptions) =>
-            handleFilterChange(filterName, selectedOptions)
+          onChange={(selectedOption) =>
+            handleFilterChange(filterName, selectedOption)
           }
         />
       ))}
@@ -124,12 +135,12 @@ const Dropdown = ({ label, id, items, onChange }) => (
       {label}:
     </label>
     <Select
-      isMulti
       name={id}
       options={items}
       onChange={onChange}
-      className="basic-multi-select"
+      className="basic-single-select"
       classNamePrefix="select"
+      isClearable
     />
   </div>
 );
@@ -141,7 +152,13 @@ Filters.propTypes = {
 Dropdown.propTypes = {
   label: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  items: PropTypes.arrayOf(PropTypes.object).isRequired,
+  items: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+      label: PropTypes.string.isRequired,
+    })
+  ).isRequired,
   onChange: PropTypes.func.isRequired,
 };
 
