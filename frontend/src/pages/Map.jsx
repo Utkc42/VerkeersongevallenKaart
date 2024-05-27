@@ -34,7 +34,8 @@ const MapPage = () => {
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const filterRef = useRef(null);
+  const markerIndex = useRef(0);
+  const filterRef = useRef();
 
   useEffect(() => {
     if (fetchMarkers) {
@@ -43,11 +44,11 @@ const MapPage = () => {
     }
   }, [fetchMarkers]);
 
-  const fetchFilteredAccidents = async (criteria) => {
+  const fetchFilteredAccidents = async (filterCriteria) => {
     setLoading(true);
     try {
       const response = await axios.get("http://localhost:8000/api/accidents", {
-        params: criteria,
+        params: filterCriteria,
       });
       console.log("API response:", response.data);
       if (Array.isArray(response.data.data)) {
@@ -64,7 +65,7 @@ const MapPage = () => {
           latitude: parseFloat(acc.latitude),
           longitude: parseFloat(acc.longitude),
           jaar: acc.JAAR,
-          maand: acc.MAAND,
+          maand: acc.MAAND < 10 ? `0${acc.MAAND}` : acc.MAAND, // Maand met voorloopnul
           tijd: formatTime(acc.TIJD),
           stad: acc.STAD,
           wegtype: wegtype[acc.WEGTYPE],
@@ -93,7 +94,6 @@ const MapPage = () => {
   };
 
   const handleSearchClick = () => {
-    console.log("Filter Criteria:", filterCriteria);
     if (Object.keys(filterCriteria).length === 0) {
       setErrorMessage("Selecteer om te zoeken alstublieft");
     } else {
@@ -107,7 +107,25 @@ const MapPage = () => {
     setFilterCriteria({});
     setSelectedMarker(null);
     setErrorMessage("");
-    filterRef.current.resetFilters(); // Reset filters
+    filterRef.current.resetFilters();
+  };
+
+  const handleMarkerClick = (index) => {
+    markerIndex.current = index;
+    setSelectedMarker(markers[index]);
+  };
+
+  const handlePrevClick = () => {
+    const newIndex =
+      (markerIndex.current - 1 + markers.length) % markers.length;
+    markerIndex.current = newIndex;
+    setSelectedMarker(markers[newIndex]);
+  };
+
+  const handleNextClick = () => {
+    const newIndex = (markerIndex.current + 1) % markers.length;
+    markerIndex.current = newIndex;
+    setSelectedMarker(markers[newIndex]);
   };
 
   return (
@@ -121,12 +139,12 @@ const MapPage = () => {
           mapboxAccessToken="pk.eyJ1IjoibW80MiIsImEiOiJjbHc1YzAxejAwcTZvMnpyejJlbzl4aW1nIn0.CKmkMIFr7WrYL8gDGz-U4Q"
           onMove={(evt) => setViewState(evt.viewState)}
         >
-          {markers.map((marker) => (
+          {markers.map((marker, index) => (
             <Marker
               key={marker.key}
               latitude={marker.latitude}
               longitude={marker.longitude}
-              onClick={() => setSelectedMarker(marker)}
+              onClick={() => handleMarkerClick(index)}
             >
               <img
                 src={markerImage}
@@ -144,6 +162,8 @@ const MapPage = () => {
             <InformatiePopup
               marker={selectedMarker}
               onClose={() => setSelectedMarker(null)}
+              onPrev={handlePrevClick}
+              onNext={handleNextClick}
             />
           )}
 

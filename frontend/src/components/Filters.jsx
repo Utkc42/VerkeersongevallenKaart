@@ -61,8 +61,8 @@ const Filters = forwardRef(({ setFilterCriteria }, ref) => {
         if (data) {
           setOptions({
             jaarMaand: data.jaarMaand.map((value) => ({
-              value: `${value.maand}/${value.jaar}`,
-              label: `${value.maand}/${value.jaar}`,
+              value: `${value.maand.toString().padStart(2, "0")}/${value.jaar}`,
+              label: `${value.maand.toString().padStart(2, "0")}/${value.jaar}`,
             })),
             tijd: data.tijd.map((value) => ({
               value,
@@ -124,7 +124,7 @@ const Filters = forwardRef(({ setFilterCriteria }, ref) => {
     <div className="space-y-4">
       {[
         {
-          label: "Jaar/Maand",
+          label: "Maand/Jaar",
           items: options.jaarMaand,
           filterName: "jaarMaand",
         },
