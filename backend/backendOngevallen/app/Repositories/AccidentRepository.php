@@ -63,7 +63,6 @@ class AccidentRepository implements IAccidentRepository
     {
         $cacheKey = 'unique_values_' . $column;
 
-        // Verwijder de cache voor deze kolom
         Cache::forget($cacheKey);
 
         return Cache::remember($cacheKey, 3600, function () use ($column) {
@@ -71,27 +70,25 @@ class AccidentRepository implements IAccidentRepository
         });
     }
 
-  public function getUniqueYearMonthValues()
-{
-    $cacheKey = 'unique_values_year_month';
+    public function getUniqueYearMonthValues()
+    {
+        $cacheKey = 'unique_values_year_month';
 
-    Cache::forget($cacheKey);
+        Cache::forget($cacheKey);
 
-    return Cache::remember($cacheKey, 3600, function () {
-        return Accident::selectRaw("DISTINCT JAAR, MAAND")
-            ->orderByRaw("JAAR ASC, MAAND ASC")
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'jaar' => $item->JAAR,
-                    'maand' => $item->MAAND,
-                    'formatted' => $item->MAAND . '/' . $item->JAAR
-                ];
-            });
-    });
-}
-
-
+        return Cache::remember($cacheKey, 3600, function () {
+            return Accident::selectRaw("DISTINCT JAAR, MAAND")
+                ->orderByRaw("JAAR ASC, MAAND ASC")
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'jaar' => $item->JAAR,
+                        'maand' => $item->MAAND,
+                        'formatted' => $item->MAAND . '/' . $item->JAAR
+                    ];
+                });
+        });
+    }
 
     public function processBatch($offset, $limit)
     {

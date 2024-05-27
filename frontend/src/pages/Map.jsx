@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ReactMapGL, {
   Marker,
   NavigationControl,
@@ -32,7 +32,9 @@ const MapPage = () => {
   const [filterCriteria, setFilterCriteria] = useState({});
   const [fetchMarkers, setFetchMarkers] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(""); // Voeg deze state toe
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const filterRef = useRef(null);
 
   useEffect(() => {
     if (fetchMarkers) {
@@ -41,10 +43,11 @@ const MapPage = () => {
     }
   }, [fetchMarkers]);
 
-  const fetchFilteredAccidents = async (filterCriteria) => {
+  const fetchFilteredAccidents = async (criteria) => {
+    setLoading(true);
     try {
       const response = await axios.get("http://localhost:8000/api/accidents", {
-        params: filterCriteria,
+        params: criteria,
       });
       console.log("API response:", response.data);
       if (Array.isArray(response.data.data)) {
@@ -84,23 +87,27 @@ const MapPage = () => {
       }
     } catch (error) {
       console.error("Failed to fetch filtered accidents:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSearchClick = () => {
+    console.log("Filter Criteria:", filterCriteria);
     if (Object.keys(filterCriteria).length === 0) {
       setErrorMessage("Selecteer om te zoeken alstublieft");
     } else {
-      setErrorMessage(""); // Verwijder eventuele bestaande foutmelding
+      setErrorMessage("");
       setFetchMarkers(true);
     }
   };
 
   const handleResetClick = () => {
-    setMarkers([]); // Clear all markers from the map
-    setFilterCriteria({}); // Reset filter criteria
-    setSelectedMarker(null); // Deselect any selected marker
-    setErrorMessage(""); // Reset error message
+    setMarkers([]);
+    setFilterCriteria({});
+    setSelectedMarker(null);
+    setErrorMessage("");
+    filterRef.current.resetFilters(); // Reset filters
   };
 
   return (
@@ -144,9 +151,14 @@ const MapPage = () => {
           <FullscreenControl />
           <GeolocateControl />
         </ReactMapGL>
+        {loading && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        )}
       </ErrorBoundary>
       <div className="w-1/3 bg-dark p-4 overflow-auto">
-        <Filter setFilterCriteria={setFilterCriteria} />
+        <Filter ref={filterRef} setFilterCriteria={setFilterCriteria} />
         {errorMessage && (
           <p className="text-red-500 font-bold mt-2">{errorMessage}</p>
         )}

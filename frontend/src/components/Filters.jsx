@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";
 import Select from "react-select";
@@ -12,7 +12,7 @@ import {
 } from "../components/DataConstants";
 import { formatTime } from "../components/TimeFormat";
 
-const Filters = ({ setFilterCriteria }) => {
+const Filters = forwardRef(({ setFilterCriteria }, ref) => {
   const [options, setOptions] = useState({
     jaarMaand: [],
     tijd: [],
@@ -24,6 +24,34 @@ const Filters = ({ setFilterCriteria }) => {
     weer: [],
     weerlicht: [],
   });
+  const [selectedOptions, setSelectedOptions] = useState({
+    jaarMaand: null,
+    tijd: null,
+    regio: null,
+    stad: null,
+    kruispunt: null,
+    bebouwingsgebied: null,
+    wegtype: null,
+    weer: null,
+    weerlicht: null,
+  });
+
+  useImperativeHandle(ref, () => ({
+    resetFilters() {
+      setSelectedOptions({
+        jaarMaand: null,
+        tijd: null,
+        regio: null,
+        stad: null,
+        kruispunt: null,
+        bebouwingsgebied: null,
+        wegtype: null,
+        weer: null,
+        weerlicht: null,
+      });
+      setFilterCriteria({});
+    },
+  }));
 
   useEffect(() => {
     axios
@@ -77,10 +105,19 @@ const Filters = ({ setFilterCriteria }) => {
 
   const handleFilterChange = (filterName, selectedOption) => {
     const value = selectedOption ? selectedOption.value : null;
-    setFilterCriteria((prev) => ({
+    setSelectedOptions((prev) => ({
       ...prev,
-      [filterName]: value,
+      [filterName]: selectedOption,
     }));
+    setFilterCriteria((prev) => {
+      const newCriteria = { ...prev };
+      if (value === null) {
+        delete newCriteria[filterName];
+      } else {
+        newCriteria[filterName] = value;
+      }
+      return newCriteria;
+    });
   };
 
   return (
@@ -120,13 +157,16 @@ const Filters = ({ setFilterCriteria }) => {
           onChange={(selectedOption) =>
             handleFilterChange(filterName, selectedOption)
           }
+          value={selectedOptions[filterName]}
         />
       ))}
     </div>
   );
-};
+});
 
-const Dropdown = ({ label, id, items, onChange }) => (
+Filters.displayName = "Filters";
+
+const Dropdown = ({ label, id, items, onChange, value }) => (
   <div className="my-2">
     <label
       htmlFor={id}
@@ -141,6 +181,7 @@ const Dropdown = ({ label, id, items, onChange }) => (
       className="basic-single-select"
       classNamePrefix="select"
       isClearable
+      value={value}
     />
   </div>
 );
@@ -160,6 +201,7 @@ Dropdown.propTypes = {
     })
   ).isRequired,
   onChange: PropTypes.func.isRequired,
+  value: PropTypes.object,
 };
 
 export default Filters;
