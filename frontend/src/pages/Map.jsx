@@ -6,7 +6,6 @@ import ReactMapGL, {
   GeolocateControl,
 } from "react-map-gl";
 import axios from "axios";
-import { Link } from "react-router-dom";
 import Filter from "../components/Filters";
 import markerImage from "../img/marker.png";
 import ErrorBoundary from "../error/ErrorBoundary";
@@ -20,6 +19,8 @@ import {
   WEERLICHT,
 } from "../components/DataConstants";
 import { formatTime } from "../components/TimeFormat";
+import MapHeader from "../components/MapHeader";
+import MapFooter from "../components/MapFooter";
 
 const MapPage = () => {
   const [viewState, setViewState] = useState({
@@ -129,78 +130,76 @@ const MapPage = () => {
   };
 
   return (
-    <div className="flex h-screen">
-      <ErrorBoundary>
-        <ReactMapGL
-          {...viewState}
-          width="70%"
-          height="90%"
-          mapStyle="mapbox://styles/mo42/clw5c7aps02ny01qp13jugo2c"
-          mapboxAccessToken="pk.eyJ1IjoibW80MiIsImEiOiJjbHc1YzAxejAwcTZvMnpyejJlbzl4aW1nIn0.CKmkMIFr7WrYL8gDGz-U4Q"
-          onMove={(evt) => setViewState(evt.viewState)}
-        >
-          {markers.map((marker, index) => (
-            <Marker
-              key={marker.key}
-              latitude={marker.latitude}
-              longitude={marker.longitude}
-              onClick={() => handleMarkerClick(index)}
-            >
-              <img
-                src={markerImage}
-                alt="Custom Marker"
-                style={{
-                  width: "15px",
-                  height: "15px",
-                  cursor: "pointer",
-                }}
+    <div className="flex flex-col h-screen">
+      <MapHeader />
+      <div className="flex h-full">
+        <ErrorBoundary>
+          <ReactMapGL
+            {...viewState}
+            width="70%"
+            height="100%"
+            mapStyle="mapbox://styles/mo42/clw5c7aps02ny01qp13jugo2c"
+            mapboxAccessToken="pk.eyJ1IjoibW80MiIsImEiOiJjbHc1YzAxejAwcTZvMnpyejJlbzl4aW1nIn0.CKmkMIFr7WrYL8gDGz-U4Q"
+            onMove={(evt) => setViewState(evt.viewState)}
+          >
+            {markers.map((marker, index) => (
+              <Marker
+                key={marker.key}
+                latitude={marker.latitude}
+                longitude={marker.longitude}
+                onClick={() => handleMarkerClick(index)}
+              >
+                <img
+                  src={markerImage}
+                  alt="Custom Marker"
+                  style={{
+                    width: "15px",
+                    height: "15px",
+                    cursor: "pointer",
+                  }}
+                />
+              </Marker>
+            ))}
+
+            {selectedMarker && (
+              <InformatiePopup
+                marker={selectedMarker}
+                onClose={() => setSelectedMarker(null)}
+                onPrev={handlePrevClick}
+                onNext={handleNextClick}
               />
-            </Marker>
-          ))}
+            )}
 
-          {selectedMarker && (
-            <InformatiePopup
-              marker={selectedMarker}
-              onClose={() => setSelectedMarker(null)}
-              onPrev={handlePrevClick}
-              onNext={handleNextClick}
-            />
+            <NavigationControl />
+            <FullscreenControl />
+            <GeolocateControl />
+          </ReactMapGL>
+          {loading && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
           )}
-
-          <NavigationControl />
-          <FullscreenControl />
-          <GeolocateControl />
-        </ReactMapGL>
-        {loading && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        )}
-      </ErrorBoundary>
-      <div className="w-1/3 bg-dark p-4 overflow-auto">
-        <Filter ref={filterRef} setFilterCriteria={setFilterCriteria} />
-        {errorMessage && (
-          <p className="text-red-500 font-bold mt-2">{errorMessage}</p>
-        )}
-        <button
-          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={handleSearchClick}
-        >
-          Zoek Op Kaart
-        </button>
-        <button
-          className="mt-4 ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          onClick={handleResetClick}
-        >
-          Reset
-        </button>
+        </ErrorBoundary>
+        <div className="w-1/3 bg-gray-800 p-4 overflow-auto">
+          <Filter ref={filterRef} setFilterCriteria={setFilterCriteria} />
+          {errorMessage && (
+            <p className="text-red-500 font-bold mt-2">{errorMessage}</p>
+          )}
+          <button
+            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleSearchClick}
+          >
+            Zoek Op Kaart
+          </button>
+          <button
+            className="mt-4 ml-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleResetClick}
+          >
+            Reset
+          </button>
+        </div>
       </div>
-      <Link
-        to="/"
-        className="absolute top-5 left-5 bg-gray-800 text-white py-2 px-4 rounded hover:bg-gray-700"
-      >
-        Terug naar Home
-      </Link>
+      <MapFooter />
     </div>
   );
 };

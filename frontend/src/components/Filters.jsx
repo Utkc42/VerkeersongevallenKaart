@@ -121,7 +121,7 @@ const Filters = forwardRef(({ setFilterCriteria }, ref) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {[
         {
           label: "Maand/Jaar",
@@ -168,10 +168,7 @@ Filters.displayName = "Filters";
 
 const Dropdown = ({ label, id, items, onChange, value }) => (
   <div className="my-2">
-    <label
-      htmlFor={id}
-      className="block mb-2 text-sm font-medium text-cyber-green"
-    >
+    <label htmlFor={id} className="block mb-2 text-base font-medium text-white">
       {label}:
     </label>
     <Select

@@ -14,7 +14,7 @@ const HomePage = () => {
 
       <Link
         to="/map"
-        className="bg-cyber-blue hover:bg-cyber-green text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out"
+        className="bg-cyber-blue hover:bg-cyber-green text-black font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out"
       >
         Bekijk de kaart
       </Link>

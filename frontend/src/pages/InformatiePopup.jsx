@@ -16,17 +16,17 @@ const InformatiePopup = ({ marker, onClose, onPrev, onNext }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <Draggable handle=".handle">
         <div className="bg-dark p-6 rounded-lg shadow-lg w-1/2 border border-cyber-blue relative">
-          <div className="handle cursor-move flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-cyber-blue text-center w-full">
+          <button
+            className="absolute top-2 right-2 text-white bg-red-500 hover:bg-red-600 active:bg-red-700 text-xl border border-red-500 px-3 py-1"
+            onClick={onClose}
+            title="Sluiten"
+          >
+            &times;
+          </button>
+          <div className="bg-gray-800 p-4 rounded-t-lg flex justify-center items-center mb-4 mt-8">
+            <h2 className="text-2xl font-bold text-white text-center">
               Ongeval Informatie
             </h2>
-            <button
-              className="text-red-500 hover:text-red-700 text-2xl border border-red-500 rounded px-2 py-1"
-              onClick={onClose}
-              title="Sluiten"
-            >
-              &times;
-            </button>
           </div>
           <div className="space-y-2 text-lg text-white">
             <p>
@@ -92,13 +92,13 @@ const InformatiePopup = ({ marker, onClose, onPrev, onNext }) => {
           </div>
           <div className="flex justify-between mt-4">
             <button
-              className="bg-cyber-blue text-dark p-3 rounded hover:bg-opacity-75"
+              className="bg-white text-dark p-3 rounded hover:bg-opacity-75"
               onClick={onPrev}
             >
               <FaArrowLeft />
             </button>
             <button
-              className="bg-cyber-blue text-dark p-3 rounded hover:bg-opacity-75"
+              className="bg-white text-dark p-3 rounded hover:bg-opacity-75"
               onClick={onNext}
             >
               <FaArrowRight />
