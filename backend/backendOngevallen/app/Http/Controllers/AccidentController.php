@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Interfaces\IAccidentRepository;
 use Illuminate\Http\Request;
 use App\Models\Accident;
+use Illuminate\Support\Facades\Cache;
 
 class AccidentController extends Controller
 {
@@ -26,7 +27,7 @@ class AccidentController extends Controller
             'REGIO' => 'regio',
             'STAD' => 'stad',
             'KRUISPUNT' => 'kruispunt',
-            'BEBOUWINGSGEBIED' => 'bebouwingsgebied',
+            'BEBOUWINGSGBIED' => 'bebouwingsgebied',
             'WEGTYPE' => 'wegtype',
             'WEER' => 'weer',
             'WEERLICHT' => 'weerlicht'
@@ -52,7 +53,10 @@ class AccidentController extends Controller
 
     public function getFilterData()
     {
-        $filterData = $this->accidentRepo->getUniqueFilterValues();
+        $filterData = Cache::remember('filter_data', 3600, function() {
+            return $this->accidentRepo->getUniqueFilterValues();
+        });
+
         return response()->json($filterData);
     }
 }

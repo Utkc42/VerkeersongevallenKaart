@@ -23,7 +23,7 @@ class AccidentRepository implements IAccidentRepository
         $this->projWGS84 = new Proj('EPSG:4326', $this->proj4); // WGS 84
     }
 
-    public function getAllAccidents($perPage = 10000)
+    public function getAllAccidents($perPage = 100000)
     {
         return Accident::paginate($perPage)->map(function ($accident) {
             $pointSrc = new Point($accident->longitude, $accident->latitude, $this->projLambert72);
@@ -63,8 +63,6 @@ class AccidentRepository implements IAccidentRepository
     {
         $cacheKey = 'unique_values_' . $column;
 
-        Cache::forget($cacheKey);
-
         return Cache::remember($cacheKey, 3600, function () use ($column) {
             return Accident::select($column)->distinct()->orderBy($column)->pluck($column);
         });
@@ -73,8 +71,6 @@ class AccidentRepository implements IAccidentRepository
     public function getUniqueYearMonthValues()
     {
         $cacheKey = 'unique_values_year_month';
-
-        Cache::forget($cacheKey);
 
         return Cache::remember($cacheKey, 3600, function () {
             return Accident::selectRaw("DISTINCT JAAR, MAAND")

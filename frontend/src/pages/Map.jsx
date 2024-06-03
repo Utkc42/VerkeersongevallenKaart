@@ -83,6 +83,7 @@ const MapPage = () => {
           botsingtype: acc.BOTSINGTYPE,
           obstakels: acc.OBSTAKELS,
         }));
+        newMarkersData.sort((a, b) => a.stad.localeCompare(b.stad));
         setMarkers(newMarkersData);
       } else {
         console.error("Expected an array, received:", response.data);
@@ -172,7 +173,13 @@ const MapPage = () => {
 
             <NavigationControl />
             <FullscreenControl />
-            <GeolocateControl />
+            <GeolocateControl
+              positionOptions={{ enableHighAccuracy: true }}
+              trackUserLocation={true}
+              showUserLocation={true}
+              fitBoundsOptions={{ maxZoom: 10 }}
+              showAccuracyCircle={false}
+            />
           </ReactMapGL>
           {loading && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

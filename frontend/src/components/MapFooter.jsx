@@ -2,7 +2,7 @@ import { FaFacebook, FaTwitter } from "react-icons/fa";
 
 const MapFooter = () => {
   return (
-    <footer className="bg-blue-950 text-white py-4 px-6 flex flex-col md:flex-row justify-between items-center">
+    <footer className="bg-gradient-to-r from-blue-800 to-blue-950 text-white py-4 px-6 flex flex-col md:flex-row justify-between items-center shadow-lg border-t border-gray-700">
       <p className="text-sm">&copy; 2024 Verkeersongevallen in België.</p>
       <nav>
         <ul className="flex flex-col md:flex-row md:space-x-4 mt-2 md:mt-0">

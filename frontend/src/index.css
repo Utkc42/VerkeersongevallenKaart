@@ -10,4 +10,23 @@
       0 0 2px #00ffff,
       0 0 3px #00ffff;
   }
+
+}
+
+@keyframes buttonClick {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.button-click {
+  animation: buttonClick 0.3s ease;
 }
