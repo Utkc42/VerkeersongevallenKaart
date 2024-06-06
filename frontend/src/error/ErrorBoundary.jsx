@@ -8,12 +8,12 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
-    console.error(error); // Nu gebruiken we 'error' voor logging.
+    console.error(error);
     return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error("Er is een fout opgetreden:", error, errorInfo); // Log de error naar de console
+    console.error("Er is een fout opgetreden:", error, errorInfo);
   }
 
   render() {
